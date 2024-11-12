@@ -26,3 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         webui.startNetwork(select.value, port.value, type)
     })
 })
+function displayMessage(msg) {
+    const textarea = document.querySelector('textarea')
+    textarea.value += msg
+}

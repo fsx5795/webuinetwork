@@ -1,5 +1,7 @@
-set_config("toolchain", "mingw")
-set_config("mingw", "C:/Users/Nook/Videos/w64devkit")
+if is_host("windows") then
+    set_config("toolchain", "mingw")
+    set_config("mingw", "C:/Users/Nook/Videos/w64devkit")
+end
 set_languages("c23", "c++2a")
 target("webui")
     after_build(function (target)
