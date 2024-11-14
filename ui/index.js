@@ -28,5 +28,5 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 function displayMessage(msg) {
     const textarea = document.querySelector('textarea')
-    textarea.value += msg
+    textarea.value += (msg + '\n')
 }

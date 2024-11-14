@@ -63,8 +63,8 @@ void start_network(webui::window::event *e)
                     perror("setsocket()");
                     return;
                 }
-                char ipstr[30];
-                inet_ntop(AF_INET, &caddr.sin_addr, ipstr, 30);
+                char ipstr[INET_ADDRSTRLEN];
+                inet_ntop(AF_INET, &caddr.sin_addr, ipstr, INET_ADDRSTRLEN);
                 char buf[BUFSIZ] = { '\0' };
                 recv(csd, buf, BUFSIZ, 0);
                 buf[strlen(buf) - 1] = '\'';
