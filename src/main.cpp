@@ -1,12 +1,20 @@
+#define __STDC_NO_THREADS__ 1
 #if defined (WIN32) || defined (_WIN32)
 #include <WinSock2.h>
 #else
 #include <netdb.h>
 #include <arpa/inet.h>
 #endif
+#include <threads.h>
+void fun()
+{
+    return;
+}
+/*
 #include <iostream>
 #include <sstream>
 #include <webui.hpp>
+static void do_work(int, const char*, struct sockaddr_in, webui::window::event*);
 void get_ips(webui::window::event *e)
 {
     char buf[100] = { '\0' };
@@ -59,35 +67,48 @@ void start_network(webui::window::event *e)
                     return;
                 }
                 int val{1};
-#if defined (WIN32) || defined (_WIN32)
+            #if defined (WIN32) || defined (_WIN32)
                 if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&val), sizeof val) < 0) {
-#else
+            #else
                 if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof val) < 0) {
-#endif
+            #endif
                     perror("setsocket()");
                     return;
                 }
                 char ipstr[INET_ADDRSTRLEN];
                 inet_ntop(AF_INET, &caddr.sin_addr, ipstr, INET_ADDRSTRLEN);
-                char buf[BUFSIZ] = { '\0' };
-                recv(csd, buf, BUFSIZ, 0);
-                buf[strlen(buf) - 1] = '\'';
-                buf[strlen(buf)] = ')';
-                buf[strlen(buf)] = ';';
-                std::stringstream ss;
-                ss << "displayMessage('" << ipstr << ":" << ntohs(caddr.sin_port) << " " << buf;
-                e->get_window().run(ss.str());
-                close(csd);
             }
         }
     }
 }
+*/
 int main()
 {
+    /*
     webui::window win;
     win.show("index.html");
     win.bind("getIps", get_ips);
     win.bind("startNetwork", start_network);
     webui::wait();
+    */
+    thrd_t thr;
+    thrd_create(&thr, (thrd_start_t)fun, NULL);
     return 0;
 }
+/*
+static void do_work(int csd, const char *ipstr, struct sockaddr_in caddr, webui::window::event *e)
+{
+    char buf[BUFSIZ];
+    while (true) {
+        memset(buf, '\0', BUFSIZ);
+        recv(csd, buf, BUFSIZ, 0);
+        buf[strlen(buf) - 1] = '\'';
+        buf[strlen(buf)] = ')';
+        buf[strlen(buf)] = ';';
+        std::stringstream ss;
+        ss << "displayMessage('" << ipstr << ":" << ntohs(caddr.sin_port) << " " << buf;
+        e->get_window().run(ss.str());
+    }
+    close(csd);
+ }
+ */
