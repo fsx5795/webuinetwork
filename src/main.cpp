@@ -1,4 +1,4 @@
-#if defined (WIN32) || defined (__WIN32)
+#if defined (WIN32) || defined (_WIN32)
 #include <WinSock2.h>
 #else
 #include <netdb.h>
@@ -59,7 +59,11 @@ void start_network(webui::window::event *e)
                     return;
                 }
                 int val{1};
+#if defined (WIN32) || defined (_WIN32)
+                if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&val), sizeof val) < 0) {
+#else
                 if (setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof val) < 0) {
+#endif
                     perror("setsocket()");
                     return;
                 }
