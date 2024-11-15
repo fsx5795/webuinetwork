@@ -11,7 +11,6 @@ target("webui")
         task.run("project", {kind = "compile_commands", outputdir = "./build"})
     end)
     add_files("src/*.cpp")
-    --add_files("src/*.c")
     add_includedirs("include")
     if is_mode("debug") then
         add_linkdirs("lib/debug")
@@ -19,9 +18,8 @@ target("webui")
         add_linkdirs("lib/release")
     end
     if is_os("windows") then
-        --add_links("webui-2-static", "ws2_32", "ole32")
-        add_links("ws2_32", "ole32")
+        add_links("webui-2-static", "ws2_32", "ole32")
     else
-        --add_links("webui-2-static")
+        add_links("webui-2-static")
     end
     --add_packages("Threads")

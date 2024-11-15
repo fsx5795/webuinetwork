@@ -1,4 +1,3 @@
-#define __STDC_NO_THREADS__ 1
 #if defined (WIN32) || defined (_WIN32)
 #include <WinSock2.h>
 #else
@@ -6,15 +5,10 @@
 #include <arpa/inet.h>
 #endif
 #include <threads.h>
-void fun()
-{
-    return;
-}
-/*
 #include <iostream>
 #include <sstream>
 #include <webui.hpp>
-static void do_work(int, const char*, struct sockaddr_in, webui::window::event*);
+static void do_work(std::tuple<int, const char*, struct sockaddr_in, webui::window::event*>*);
 void get_ips(webui::window::event *e)
 {
     char buf[100] = { '\0' };
@@ -77,38 +71,36 @@ void start_network(webui::window::event *e)
                 }
                 char ipstr[INET_ADDRSTRLEN];
                 inet_ntop(AF_INET, &caddr.sin_addr, ipstr, INET_ADDRSTRLEN);
+                thrd_t thr;
+                std::tuple<int, const char*, struct sockaddr_in, webui::window::event*> para{csd, ipstr, caddr, e};
+                thrd_create(&thr, (thrd_start_t)do_work, static_cast<void*>(&para));
+                thrd_detach(thr);
             }
         }
     }
 }
-*/
 int main()
 {
-    /*
     webui::window win;
     win.show("index.html");
     win.bind("getIps", get_ips);
     win.bind("startNetwork", start_network);
     webui::wait();
-    */
-    thrd_t thr;
-    thrd_create(&thr, (thrd_start_t)fun, NULL);
     return 0;
 }
-/*
-static void do_work(int csd, const char *ipstr, struct sockaddr_in caddr, webui::window::event *e)
+static void do_work(std::tuple<int, const char*, struct sockaddr_in, webui::window::event*> *para)
 {
     char buf[BUFSIZ];
     while (true) {
         memset(buf, '\0', BUFSIZ);
-        recv(csd, buf, BUFSIZ, 0);
+        if (recv(std::get<0>(*para), buf, BUFSIZ, 0) == 0)
+            break;
         buf[strlen(buf) - 1] = '\'';
         buf[strlen(buf)] = ')';
         buf[strlen(buf)] = ';';
         std::stringstream ss;
-        ss << "displayMessage('" << ipstr << ":" << ntohs(caddr.sin_port) << " " << buf;
-        e->get_window().run(ss.str());
+        ss << "displayMessage('" << std::get<1>(*para) << ":" << ntohs(std::get<2>(*para).sin_port) << " " << buf;
+        std::get<3>(*para)->get_window().run(ss.str());
     }
-    close(csd);
+    close(std::get<0>(*para));
  }
- */
