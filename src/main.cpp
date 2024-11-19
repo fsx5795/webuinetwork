@@ -120,6 +120,9 @@ static void do_work(std::tuple<int, const char*, struct sockaddr_in, webui::wind
         ss << "displayMessage('" << std::get<1>(*para) << ":" << ntohs(std::get<2>(*para).sin_port) << " " << buf;
         std::get<3>(*para)->get_window().run(ss.str());
     }
-    //close(std::get<0>(*para));
+#if defined (WIN32) || defined (_WIN32)
     _close(std::get<0>(*para));
+#else
+    close(std::get<0>(*para));
+#endif
  }
