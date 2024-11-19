@@ -14,6 +14,7 @@ void get_ips(webui::window::event *e)
     char buf[100] = { '\0' };
     std::string ips;
     if (gethostname(buf, sizeof(buf)) == 0) {
+        /*
         struct hostent *he = gethostbyname(buf);
         if (he != nullptr) {
             for (int i{0}; he->h_addr_list[i] != nullptr; ++i) {
@@ -23,6 +24,23 @@ void get_ips(webui::window::event *e)
                 ips.append(localIp);
                 ips.push_back(',');
             }
+        }
+        */
+        struct addrinfo hints, *res;
+        memset(&hints, '\0', sizeof(struct addrinfo));
+        hints.ai_family = AF_INET;
+        int ret = getaddrinfo(buf, nullptr, &hints, &res);
+        if (ret != 0) {
+            fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(ret));
+            return;
+        }
+        char host[256];
+        for (struct addrinfo *tmp = res; tmp != nullptr; tmp = tmp->ai_next) {
+            getnameinfo(tmp->ai_addr, tmp->ai_addrlen, host, sizeof host, nullptr, 0, NI_NUMERICHOST);
+            if (strcmp("127.0.0.1", host) == 0)
+                continue;
+            ips.append(host);
+            ips.push_back(',');
         }
     }
     if (ips.length() != 0)
@@ -102,5 +120,6 @@ static void do_work(std::tuple<int, const char*, struct sockaddr_in, webui::wind
         ss << "displayMessage('" << std::get<1>(*para) << ":" << ntohs(std::get<2>(*para).sin_port) << " " << buf;
         std::get<3>(*para)->get_window().run(ss.str());
     }
-    close(std::get<0>(*para));
+    //close(std::get<0>(*para));
+    _close(std::get<0>(*para));
  }

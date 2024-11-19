@@ -1,9 +1,6 @@
---[[
 if is_host("windows") then
-    set_config("toolchain", "mingw")
-    set_config("mingw", "C:/Users/Nook/Videos/w64devkit")
+    add_requires("openssl")
 end
-]]
 set_languages("c23", "c++23")
 target("webui")
     after_build(function (target)
@@ -17,8 +14,9 @@ target("webui")
     else
         add_linkdirs("lib/release")
     end
-    if is_os("windows") then
-        add_links("webui-2-static", "ws2_32", "ole32")
+    if is_host("windows") then
+        add_packages("openssl")
+        add_links("webui-2-secure-static", "user32", "advapi32", "shell32", "ole32")
     else
         add_links("webui-2-static")
     end
